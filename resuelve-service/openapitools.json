@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.9.0",
+    "generators": {
+      "resuelve-dart-client": {
+        "generatorName": "dart-dio",
+        "inputSpec": "specs/001-bienvenida-video-marca/contracts/openapi.yml",
+        "output": "mobile/lib/infraestructura/red/generated",
+        "additionalProperties": {
+          "pubName": "resuelve_api_client",
+          "pubVersion": "1.0.0",
+          "useEnumExtension": true,
+          "dateLibrary": "core",
+          "nullSafe": true
+        }
+      }
+    }
+  }
+}

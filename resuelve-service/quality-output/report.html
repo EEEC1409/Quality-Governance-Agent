@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<title>Reporte de calidad · resuelve-service</title>
+<style>
+ body{margin:0;background:#F3F4F1;color:#0E1A26;font:16px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;padding:40px}
+ .wrap{max-width:880px;margin:0 auto}
+ h1{font-size:30px;margin:0 0 4px;letter-spacing:-.02em}
+ .eyebrow{font:700 12px/1 IBM Plex Mono,monospace;color:#9E1B2E;letter-spacing:.12em;text-transform:uppercase}
+ .verdict{display:inline-block;background:#B3402F;color:#fff;font:800 20px/1 IBM Plex Mono,monospace;padding:12px 22px;border-radius:10px;margin:14px 0 28px}
+ .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+ .card{border:1px solid #d7dad5;border-radius:12px;padding:16px;background:#fbfcfa}
+ .card h3{margin:0 0 8px;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:#46535f}
+ .big{font-size:22px;font-weight:800;margin-top:6px}
+ table{width:100%;border-collapse:collapse;margin:10px 0 26px;font-size:14px}
+ th{text-align:left;font:700 11px/1 IBM Plex Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:#46535f;border-bottom:2px solid #9E1B2E;padding:8px 10px}
+ td{padding:9px 10px;border-bottom:1px solid #e6e8e4;vertical-align:top}
+ h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#8F6A1C;margin:24px 0 6px}
+ .meta{color:#5a6b78;font:13px/1.5 IBM Plex Mono,monospace}
+</style></head><body><div class="wrap">
+ <div class="eyebrow">Quality &amp; Governance Agent · Unidad 3</div>
+ <h1>Reporte de calidad — resuelve-service <span class="meta">v1.0.0</span></h1>
+ <div class="meta">commit n/a — el directorio backend no es un repositorio git independiente · 2026-06-27 · umbral cobertura 80%</div>
+ <div class="verdict">BLOQUEADO</div>
+ <div class="pillars">
+   <div class="card"><h3>Pruebas <span style="background:#2E7D52;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">PASA</span></h3>
+     <div class="big">19/19</div>
+     <div class="meta">cobertura 85.1%</div></div>
+   <div class="card"><h3>Seguridad <span style="background:#2E7D52;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">PASA</span></h3>
+     <div class="big">0 críticas</div>
+     <div class="meta">0 high · 0 secretos</div></div>
+   <div class="card"><h3>Criterios <span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></h3>
+     <div class="big">0/6</div>
+     <div class="meta">criterios que cumplen</div></div>
+ </div>
+ <h2>Criterios de aceptación</h2>
+ <table><thead><tr><th>Criterio</th><th>Estado</th><th>Evidencia</th></tr></thead><tbody><tr><td style="font-family:IBM Plex Mono,monospace">RF-001</td><td><span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></td><td>Tests Flutter existen en mobile/test/functional/bdd/bienvenida_con_conexion_test.dart (expect logo_bienvenida findsOneWidget con conexión) y mobile/test/functional/bdd/bienvenida_sin_conexion_test.dart (expect logo_bienvenida findsOneWidget sin conexión). NO fueron ejecutados en este audit: el pipeline Gradle del backend no corre tests Flutter/Dart. Sin ejecución confirmada no se puede declarar cumple.</td></tr><tr><td style="font-family:IBM Plex Mono,monospace">RF-002</td><td><span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></td><td>No existe ninguna prueba — ni en backend/src/test ni en mobile/test — que afirme explícitamente que el reproductor de video INICIA automáticamente. bienvenida_con_conexion_test.dart verifica que el logo es visible y el botón Continuar está presente cuando el UC retorna Success, pero no busca ningún widget de video ni verifica autoplay. El backend Cucumber verifica que videoUrl está presente en la respuesta (HTTP 200), pero eso es disponibilidad del dato, no reproducción automática. RF-002 carece de prueba demostrativa.</td></tr><tr><td style="font-family:IBM Plex Mono,monospace">RF-003</td><td><span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></td><td>Tests Flutter existen: bienvenida_con_conexion_test.dart (expect boton_continuar findsOneWidget) y bienvenida_sin_conexion_test.dart (expect boton_continuar findsOneWidget + verifica onPressed != null). Cubren el requisito en ambas condiciones de conectividad. NO ejecutados en este audit (requieren Flutter toolchain). Sin ejecución confirmada no se puede declarar cumple.</td></tr><tr><td style="font-family:IBM Plex Mono,monospace">RF-004</td><td><span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></td><td>Dos condiciones, ninguna probada completamente: (1) 'cuando el video termine': no existe ninguna prueba. (2) 'cuando el cliente toque Continuar': bienvenida_con_conexion_test.dart y bienvenida_sin_conexion_test.dart verifican únicamente que mockMarcarUC.ejecutar() es llamado al tocar el botón — no hay ningún expect/find que afirme que la navegación a la pantalla de cédula ocurrió (no hay ruta /cedula definida en el MaterialApp de la prueba, ni find.byKey('pantalla_cedula') ni Navigator pop/push assertion). segundo_acceso_test.dart verifica la pantalla de arranque (ArranqueScreen), no la navegación desde BienvenidaScreen. La prueba de navegación desde BienvenidaScreen a cédula no existe.</td></tr><tr><td style="font-family:IBM Plex Mono,monospace">RF-005</td><td><span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></td><td>Tests Flutter existen que cubren este comportamiento: bienvenida_sin_conexion_test.dart (expect AlertDialog findsNothing, SnackBar findsNothing, texto 'error' findsNothing); contenido_marca_gateway_offline_test.dart (Failure(SinConectividadException) retornado sin llamada HTTP); contenido_marca_gateway_cdn_error_test.dart (Failure(ErrorCdnException) sin AlertDialog ni SnackBar). NO ejecutados en este audit (requieren Flutter toolchain). Sin ejecución confirmada no se puede declarar cumple.</td></tr><tr><td style="font-family:IBM Plex Mono,monospace">RF-006</td><td><span style="background:#B3402F;color:#fff;padding:3px 12px;border-radius:999px;font:700 13px/1 IBM Plex Mono,monospace">FALLA</span></td><td>Tests Flutter existen: verificar_primer_uso_uc_test.dart (VerificarPrimerUsoUC retorna true si bienvenidaVista=false, false si true); marcar_bienvenida_vista_uc_test.dart (MarcarBienvenidaVistaUC invoca marcarComoVisto exactamente una vez); primer_uso_gateway_test.dart (integración SharedPreferences: estado persiste); segundo_acceso_test.dart (ArranqueScreen con verificarPrimerUsoUC.ejecutar()=false navega directamente a /cedula). La lógica está bien cubierta por la intención de las pruebas. NO ejecutados en este audit (requieren Flutter toolchain). Sin ejecución confirmada no se puede declarar cumple.</td></tr></tbody></table>
+ <h2>Hallazgos de seguridad (Semgrep MCP)</h2>
+ <table><thead><tr><th>Severidad</th><th>Ubicación</th><th>Nota</th></tr></thead><tbody><tr><td>informativo — no bloquea el gate (critical=0, secrets=0)</td><td style="font-family:IBM Plex Mono,monospace">backend/src/main/java/com/resuelve/adaptadores/marca/MarcaController.java:29</td><td></td></tr></tbody></table>
+ <div class="meta">Generado por build-report.py · misma regla del gate · "el gate manda, no el modelo".</div>
+</div></body></html>
