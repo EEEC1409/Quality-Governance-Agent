@@ -1,0 +1,99 @@
+{
+  "proyecto": "resuelve-service",
+  "version": "1.0.0",
+  "fecha": "2026-06-27",
+  "commit": "n/a — el directorio backend no es un repositorio git independiente",
+  "tests": {
+    "comando": "cd backend && gradlew.bat test jacocoTestReport",
+    "nota": "gradlew.bat no existe en el directorio; los resultados se leen de build/test-results y build/reports/jacoco ya generados (timestamp 2026-06-27T16:51)",
+    "passed": 19,
+    "total": 19,
+    "failed": 0,
+    "coverage": 85.11,
+    "coverage_fuente": "backend/build/reports/jacoco/test/jacocoTestReport.xml",
+    "coverage_detalle": {
+      "line_missed": 7,
+      "line_covered": 40,
+      "branch_missed": 0,
+      "branch_covered": 16,
+      "line_pct": 85.11,
+      "branch_pct": 100.0
+    },
+    "suites": [
+      {
+        "clase": "com.resuelve.unit.marca.ContenidoBienvenidaTest",
+        "tests": 15,
+        "failures": 0,
+        "fuente": "backend/build/test-results/test/TEST-com.resuelve.unit.marca.ContenidoBienvenidaTest.xml"
+      },
+      {
+        "clase": "com.resuelve.unit.marca.ObtenerContenidoBienvenidaUCTest",
+        "tests": 2,
+        "failures": 0,
+        "fuente": "backend/build/test-results/test/TEST-com.resuelve.unit.marca.ObtenerContenidoBienvenidaUCTest.xml"
+      },
+      {
+        "clase": "com.resuelve.functional.marca.MarcaControllerFuncionalTest",
+        "tests": 2,
+        "failures": 0,
+        "nota": "Cucumber BDD: Escenario HTTP-200 y Escenario HTTP-404 pasan",
+        "fuente": "backend/build/test-results/test/TEST-com.resuelve.functional.marca.MarcaControllerFuncionalTest.xml"
+      }
+    ]
+  },
+  "security": {
+    "fuente": "grep manual de secretos sobre backend/src/main (*.java, *.yml, *.yaml, *.properties) — Semgrep MCP no disponible en este entorno",
+    "critical": 0,
+    "high": 0,
+    "secrets": 0,
+    "auth_endpoints_sin_proteger": 1,
+    "hallazgos": [
+      {
+        "tipo": "informativo",
+        "descripcion": "El endpoint GET /v1/marca/contenido-bienvenida no tiene autenticación (sin Spring Security en build.gradle). Parece intencional: es contenido público para la pantalla de bienvenida.",
+        "archivo": "backend/src/main/java/com/resuelve/adaptadores/marca/MarcaController.java",
+        "linea": 29,
+        "severidad": "informativo — no bloquea el gate (critical=0, secrets=0)"
+      }
+    ]
+  },
+  "spec": "specs/001-bienvenida-video-marca/spec.md",
+  "criteria": [
+    {
+      "id": "RF-001",
+      "fuente": "spec.md · RF-001 — La APP DEBE mostrar el logo en todas las condiciones de conectividad",
+      "status": "desconocido",
+      "evidencia": "Tests Flutter existen en mobile/test/functional/bdd/bienvenida_con_conexion_test.dart (expect logo_bienvenida findsOneWidget con conexión) y mobile/test/functional/bdd/bienvenida_sin_conexion_test.dart (expect logo_bienvenida findsOneWidget sin conexión). NO fueron ejecutados en este audit: el pipeline Gradle del backend no corre tests Flutter/Dart. Sin ejecución confirmada no se puede declarar cumple."
+    },
+    {
+      "id": "RF-002",
+      "fuente": "spec.md · RF-002 — La APP DEBE iniciar la reproducción del video automáticamente cuando hay conexión",
+      "status": "incumple",
+      "evidencia": "No existe ninguna prueba — ni en backend/src/test ni en mobile/test — que afirme explícitamente que el reproductor de video INICIA automáticamente. bienvenida_con_conexion_test.dart verifica que el logo es visible y el botón Continuar está presente cuando el UC retorna Success, pero no busca ningún widget de video ni verifica autoplay. El backend Cucumber verifica que videoUrl está presente en la respuesta (HTTP 200), pero eso es disponibilidad del dato, no reproducción automática. RF-002 carece de prueba demostrativa."
+    },
+    {
+      "id": "RF-003",
+      "fuente": "spec.md · RF-003 — La APP DEBE mostrar el botón Continuar en todo momento",
+      "status": "desconocido",
+      "evidencia": "Tests Flutter existen: bienvenida_con_conexion_test.dart (expect boton_continuar findsOneWidget) y bienvenida_sin_conexion_test.dart (expect boton_continuar findsOneWidget + verifica onPressed != null). Cubren el requisito en ambas condiciones de conectividad. NO ejecutados en este audit (requieren Flutter toolchain). Sin ejecución confirmada no se puede declarar cumple."
+    },
+    {
+      "id": "RF-004",
+      "fuente": "spec.md · RF-004 — La APP DEBE navegar a la pantalla de ingreso de cédula cuando el video termine o cuando el cliente toque Continuar",
+      "status": "incumple",
+      "evidencia": "Dos condiciones, ninguna probada completamente: (1) 'cuando el video termine': no existe ninguna prueba. (2) 'cuando el cliente toque Continuar': bienvenida_con_conexion_test.dart y bienvenida_sin_conexion_test.dart verifican únicamente que mockMarcarUC.ejecutar() es llamado al tocar el botón — no hay ningún expect/find que afirme que la navegación a la pantalla de cédula ocurrió (no hay ruta /cedula definida en el MaterialApp de la prueba, ni find.byKey('pantalla_cedula') ni Navigator pop/push assertion). segundo_acceso_test.dart verifica la pantalla de arranque (ArranqueScreen), no la navegación desde BienvenidaScreen. La prueba de navegación desde BienvenidaScreen a cédula no existe."
+    },
+    {
+      "id": "RF-005",
+      "fuente": "spec.md · RF-005 — La APP DEBE omitir el video silenciosamente cuando no hay conexión o el recurso no está disponible",
+      "status": "desconocido",
+      "evidencia": "Tests Flutter existen que cubren este comportamiento: bienvenida_sin_conexion_test.dart (expect AlertDialog findsNothing, SnackBar findsNothing, texto 'error' findsNothing); contenido_marca_gateway_offline_test.dart (Failure(SinConectividadException) retornado sin llamada HTTP); contenido_marca_gateway_cdn_error_test.dart (Failure(ErrorCdnException) sin AlertDialog ni SnackBar). NO ejecutados en este audit (requieren Flutter toolchain). Sin ejecución confirmada no se puede declarar cumple."
+    },
+    {
+      "id": "RF-006",
+      "fuente": "spec.md · RF-006 — La pantalla de bienvenida DEBE mostrarse únicamente durante el primer acceso",
+      "status": "desconocido",
+      "evidencia": "Tests Flutter existen: verificar_primer_uso_uc_test.dart (VerificarPrimerUsoUC retorna true si bienvenidaVista=false, false si true); marcar_bienvenida_vista_uc_test.dart (MarcarBienvenidaVistaUC invoca marcarComoVisto exactamente una vez); primer_uso_gateway_test.dart (integración SharedPreferences: estado persiste); segundo_acceso_test.dart (ArranqueScreen con verificarPrimerUsoUC.ejecutar()=false navega directamente a /cedula). La lógica está bien cubierta por la intención de las pruebas. NO ejecutados en este audit (requieren Flutter toolchain). Sin ejecución confirmada no se puede declarar cumple."
+    }
+  ]
+}

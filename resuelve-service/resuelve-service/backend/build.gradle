@@ -1,0 +1,108 @@
+plugins {
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'java'
+    id 'jacoco'
+}
+
+group = 'com.resuelve'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    cucumberVersion = '7.18.0'
+    restAssuredVersion = '5.4.0'
+    springdocVersion = '2.5.0'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+    runtimeOnly 'org.postgresql:postgresql'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2'
+    testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-spring:${cucumberVersion}"
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.platform:junit-platform-suite-api'
+    testImplementation 'org.junit.platform:junit-platform-suite-engine'
+    testImplementation "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
+    testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+    testImplementation "io.rest-assured:json-schema-validator:${restAssuredVersion}"
+}
+
+configurations {
+    testImplementation.exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+    jvmArgs = [
+        '-Xmx768m', '-Xms256m',
+        '-XX:+UseSerialGC',
+        '-XX:ReservedCodeCacheSize=32m',
+        '-XX:-TieredCompilation',
+        '-XX:+EnableDynamicAgentLoading',
+        '-Djdk.attach.allowAttachSelf=true'
+    ]
+    maxParallelForks = 1
+    forkEvery = 0
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+        }
+        rule {
+            element = 'CLASS'
+            excludes = [
+                'com.resuelve.ResuelveServiceApplication',
+                'com.resuelve.infraestructura.marca.ContenidoBienvenidaJpaEntity'
+            ]
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification

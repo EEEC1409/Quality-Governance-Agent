@@ -1,0 +1,132 @@
+openapi: 3.0.3
+
+info:
+  title: Resuelve Service API
+  description: >
+    API REST del servicio backend de la aplicación móvil Resuelve.
+    Todos los endpoints están versionados bajo `/v1`.
+  version: 1.0.0
+  contact:
+    name: Equipo Resuelve
+  license:
+    name: Propietario
+
+servers:
+  - url: https://api.resuelve.com/v1
+    description: Producción
+  - url: https://api-staging.resuelve.com/v1
+    description: Staging
+  - url: http://localhost:8080/v1
+    description: Desarrollo local
+
+tags:
+  - name: Marca
+    description: Recursos de identidad y contenido de marca Resuelve
+
+paths:
+  /marca/contenido-bienvenida:
+    get:
+      tags:
+        - Marca
+      summary: Obtener contenido de la pantalla de bienvenida
+      description: >
+        Retorna las URLs del logo y video de la marca Resuelve para mostrar en la
+        pantalla de bienvenida del primer acceso. El cliente móvil debe manejar
+        la ausencia de red antes de llamar a este endpoint; si no hay conexión,
+        debe usar el logo empaquetado en la APP y omitir el video.
+      operationId: obtenerContenidoBienvenida
+      responses:
+        '200':
+          description: Contenido de bienvenida obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContenidoBienvenidaResponse'
+              example:
+                logoUrl: "https://assets.resuelve.com/marca/logo-principal.png"
+                videoUrl: "https://assets.resuelve.com/marca/video-bienvenida-v2.mp4"
+                version: "2.1.0"
+        '404':
+          description: Contenido de bienvenida no encontrado (no existe ningún registro activo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                codigo: "CONTENIDO_NO_ENCONTRADO"
+                mensaje: "No existe contenido de bienvenida activo configurado."
+                timestamp: "2026-06-27T14:30:00Z"
+        '500':
+          description: Error interno del servidor (fallo inesperado al acceder al recurso)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                codigo: "ERROR_INTERNO"
+                mensaje: "Ocurrió un error inesperado. Intente más tarde."
+                timestamp: "2026-06-27T14:30:00Z"
+        '503':
+          description: Servicio temporalmente no disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                codigo: "SERVICIO_NO_DISPONIBLE"
+                mensaje: "El servicio está temporalmente fuera de línea. Intente más tarde."
+                timestamp: "2026-06-27T14:30:00Z"
+
+components:
+  schemas:
+
+    ContenidoBienvenidaResponse:
+      type: object
+      description: Contenido de marca para la pantalla de bienvenida
+      required:
+        - logoUrl
+        - videoUrl
+        - version
+      properties:
+        logoUrl:
+          type: string
+          format: uri
+          description: >
+            URL absoluta HTTPS del logo de la marca Resuelve. Este recurso SIEMPRE
+            debe estar disponible; su ausencia es un error del servidor.
+          example: "https://assets.resuelve.com/marca/logo-principal.png"
+        videoUrl:
+          type: string
+          format: uri
+          description: >
+            URL absoluta HTTPS del video de marca Resuelve. El cliente móvil puede
+            omitir la reproducción si no hay conectividad o si la carga falla.
+          example: "https://assets.resuelve.com/marca/video-bienvenida-v2.mp4"
+        version:
+          type: string
+          description: >
+            Versión del contenido de bienvenida. Permite al cliente invalidar
+            cachés cuando el contenido cambia.
+          example: "2.1.0"
+
+    ErrorResponse:
+      type: object
+      description: Respuesta de error estándar de la API
+      required:
+        - codigo
+        - mensaje
+        - timestamp
+      properties:
+        codigo:
+          type: string
+          description: Código de error legible por máquina
+          example: "SERVICIO_NO_DISPONIBLE"
+        mensaje:
+          type: string
+          description: Descripción del error legible por humanos
+          example: "El servicio está temporalmente fuera de línea."
+        timestamp:
+          type: string
+          format: date-time
+          description: Momento en que ocurrió el error (ISO 8601 UTC)
+          example: "2026-06-27T14:30:00Z"
